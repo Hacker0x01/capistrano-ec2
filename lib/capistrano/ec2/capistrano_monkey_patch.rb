@@ -25,8 +25,8 @@ module Capistrano
 
     def for_each_ec2_server(ec2_env:, ec2_role:, &block)
       filters = {
-        "tag:ec2_env" => ec2_env,
-        "tag:role" => ec2_role,
+        "tag:ec2_env": ec2_env,
+        "tag:role": ec2_role,
         'instance-state-name': 'running'
       }
 
