@@ -5,13 +5,15 @@ require_relative('../../assume_role_credential_fetcher')
 module Capistrano
   class Configuration
     def ec2
+      region = fetch(:region)
+
       configuration = {
         provider: 'AWS',
-        region: fetch(:region)
+        region: region,
       }
 
       if assume_role_using_profile
-        assumed_role_credentials = AssumeRoleCredentialFetcher.new(assume_role_using_profile).credentials
+        assumed_role_credentials = AssumeRoleCredentialFetcher.new(assume_role_using_profile, region).credentials
 
         configuration['aws_session_token'] = assumed_role_credentials['SessionToken']
         configuration['aws_access_key_id'] = assumed_role_credentials['AccessKeyId']
