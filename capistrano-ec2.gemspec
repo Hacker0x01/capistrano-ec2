@@ -28,7 +28,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "capistrano", "~> 3.0"
-  spec.add_dependency "fog-aws", "~> 0.10.0"
+  spec.add_dependency "fog-aws", "~> 3.0"
+  spec.add_dependency "inifile", "~> 3.0"
 
   spec.add_development_dependency "bundler", "~> 1.12"
   spec.add_development_dependency "rake", "~> 10.0"

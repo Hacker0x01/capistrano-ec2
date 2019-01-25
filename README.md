@@ -18,16 +18,17 @@ Or install it yourself as:
 
     $ gem install capistrano-ec2
 
-## Usage
 
-**Requirements:**
+## Configuration
 
-Set the EC region in which your instances live in the Capistrano deploy configuration:
+Set the AWS region in which your instances live in the Capistrano deploy configuration:
 
-config/deploy.rb
+**config/deploy.rb**
 ```ruby
 set :region, 'us-west-2'
 ```
+
+### Using a credentials file
 
 Since it's a bad practice to have your credentials in source code, you should load them from default fog configuration file: `~/.fog`. This file could look like this:
 
@@ -37,10 +38,37 @@ default:
   aws_secret_access_key: <YOUR_SECRET_ACCESS_KEY>
 ```
 
-As an alternative to directly using credentials, you can also use IAM instance profiles by
-setting `:use_iam_profile` to `true` in the deploy configuration.
+### Using IAM instance profiles
 
-**Usage:**
+As an alternative to directly using credentials, you can also use IAM instance profiles by setting `:use_iam_profile` to `true` in the deploy configuration.
+
+**config/deploy.rb**
+```ruby
+set :use_iam_profile, true
+```
+
+### Using assume role configured in AWS configuration profile
+
+As an alternative to directly using credentials, you can configure capistrano-ec2 to assume a role by setting `:assume_role_using_profile` to the desired AWS profile in your configuration file that contains the role in its `role_arn` directive. This will use the instance its IAM Profile.
+
+**config/deploy.rb**
+```ruby
+set :assume_role_using_profile, '<profile_name>'
+```
+
+This will read the AWS profile configuration from `~/.aws/config` and is expecting the following profile defined:
+
+**~/.aws/config**
+```
+[profile <profile_name>]
+role_arn = arn:aws:iam::AWS_ACCOUNT:role/<some_role_name>
+credential_source = Ec2InstanceMetadata
+```
+
+The `role_arn` configured here will be the assumed role.
+
+
+## Usage
 
 Tag your EC2 instances so you can target specific servers in your Capistrano configuration.
 
@@ -48,6 +76,19 @@ Here is how to target all `production` `application-servers`:
 
 ```ruby
 for_each_ec2_server(ec2_env: "production", ec2_role: "application-server") do |ec2_server|
+  server ec2_server.private_ip_address, user: 'deploy', roles: roles
+end
+```
+
+### Tagging single server with additional role
+
+You'd probably want to have a single instance that is tagged with the "db" role. The seconds argument in the `do` block of `for_each_ec2_server` is the index of the current loop, you can use this as follows:
+
+```ruby
+for_each_ec2_server(ec2_env: "production", ec2_role: "application-server") do |ec2_server, index|
+  # Only add "db" role to the first server
+  roles = index.zero? ? %w(db app) : %w(app)
+
   server ec2_server.private_ip_address, user: 'deploy', roles: roles
 end
 ```
