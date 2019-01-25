@@ -49,7 +49,7 @@ set :use_iam_profile, true
 
 ### Using assume role configured in AWS configuration profile
 
-As an alternative to directly using credentials, you can configure capistrano-ec2 to assume a role by setting `:assume_role_using_profile` to the desired AWS profile in yuou configuration file that contains the role in its `role_arn` directive. This will use the instance its IAM Profile.
+As an alternative to directly using credentials, you can configure capistrano-ec2 to assume a role by setting `:assume_role_using_profile` to the desired AWS profile in your configuration file that contains the role in its `role_arn` directive. This will use the instance its IAM Profile.
 
 **config/deploy.rb**
 ```ruby
